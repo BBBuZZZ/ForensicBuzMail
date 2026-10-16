@@ -1,5 +1,3 @@
-# ForensicBuzMail
-Parseador Forense
 # ForensicBuzMail ⚡
 ### Analizador Forense de Protocolos y Correos Electrónicos (.eml, .msg y Texto Plano)
 **Modo SaaS Dark Mode // 100% Entorno Local y Privado**

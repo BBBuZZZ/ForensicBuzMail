@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ForensicBuzMail // Analizador Forense de Correos</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- TOP NAVIGATION -->
+  <header class="navbar">
+    <div class="nav-brand">
+      <img src="img/logo_forense.jpg" class="nav-badge-icon" alt="Policía Científica - Informática Forense">
+      <div class="brand-text">
+        <h1>ForensicBuzMail</h1>
+        <span>Informática Forense · Policía Científica</span>
+      </div>
+    </div>
+    <div class="nav-status">
+      <div class="badge-local">
+        <span class="badge-local-dot"></span>
+        <span>100% ENTORNO LOCAL / PRIVADO</span>
+      </div>
+      <button class="btn btn-secondary btn-sm" onclick="App.switchTab('tab-history')">
+        📁 Historial SQLite
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN APP CONTAINER WITH TWO-COLUMN LATERAL LAYOUT -->
+  <main class="app-container">
+    <div class="app-layout">
+
+      <!-- LATERAL SIDEBAR PANEL -->
+      <aside class="lateral-sidebar">
+        
+        <!-- OFFICIAL EMBLEM CARD -->
+        <div class="police-card">
+          <div class="police-crest-container">
+            <img src="img/logo_forense.jpg" class="police-crest-img" alt="Brigada Provincial de Policía Científica - Madrid - Informática Forense">
+          </div>
+          <div class="police-card-info">
+            <div class="police-badge-authority">POLICÍA NACIONAL</div>
+            <div class="police-badge-dept">Comisaría General de Policía Científica</div>
+            <div class="police-badge-brigade">Brigada Provincial de Madrid</div>
+            <div class="police-badge-section">SECCIÓN INFORMÁTICA FORENSE</div>
+            
+            <div class="police-seal-divider"></div>
+            
+            <div class="police-lab-tag">
+              <span class="police-dot"></span>
+              <span>Laboratorio de Evidencias Digitales</span>
+            </div>
+            <p class="police-meta-note">
+              Estación pericial de análisis, verificación criptográfica (SPF/DKIM/DMARC) y trazabilidad SMTP de correos electrónicos (.eml / .msg).
+            </p>
+          </div>
+        </div>
+
+        <!-- QUICK IP GEOLOCATION AUDITOR WIDGET -->
+        <div class="sidebar-widget">
+          <div class="widget-title">
+            <span>🌍</span>
+            <h4>Localizador de IP</h4>
+          </div>
+          <p class="widget-subtitle">Inspección RIR offline y geolocalización de servidores.</p>
+          <div class="widget-search-box">
+            <input type="text" id="quick-ip-input" placeholder="Ej: 209.85.220.41" class="sidebar-search-input" onkeydown="if(event.key==='Enter') App.lookupSidebarIp()">
+            <button class="btn btn-primary btn-sm" onclick="App.lookupSidebarIp()">🔍</button>
+          </div>
+          <div id="quick-ip-result" class="quick-ip-result" style="display: none;"></div>
+        </div>
+
+        <!-- PERICIAL GUARANTEES CARD -->
+        <div class="sidebar-widget" style="padding: 1rem 1.15rem;">
+          <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.5rem;">
+            Garantías Forenses
+          </div>
+          <ul class="specs-list">
+            <li>🔒 <strong>100% Local:</strong> Cero fuga de evidencias</li>
+            <li>📜 <strong>RFC 5322:</strong> Normalización verbatim</li>
+            <li>🛡️ <strong>Seguro:</strong> Previsualización sandboxed</li>
+            <li>💾 <strong>SQLite:</strong> Registro pericial inmutable</li>
+          </ul>
+        </div>
+
+      </aside>
+
+      <!-- MAIN WORKSPACE CONTENT -->
+      <div class="main-content">
+
+        <!-- INPUT MODE SWITCHER -->
+        <div class="input-mode-switcher">
+          <button class="mode-tab-btn active" id="btn-mode-file" onclick="App.setInputMode('file')">
+            📂 Subir Archivo (.eml / .msg)
+          </button>
+          <button class="mode-tab-btn" id="btn-mode-text" onclick="App.setInputMode('text')">
+            📝 Pegar Texto Plano / Cabeceras (Gmail / Outlook)
+          </button>
+        </div>
+
+        <!-- UPLOAD DROPZONE -->
+        <section class="dropzone-container" id="dropzone">
+          <input type="file" id="file-input" accept=".eml,.msg" style="display: none;">
+          <div class="dropzone-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+          </div>
+          <h3 class="dropzone-title">Arrastre y suelte su archivo de correo aquí</h3>
+          <p class="dropzone-subtitle">Soporta correos en formato estándar <strong>.EML</strong> (RFC 5322) y Microsoft Outlook <strong>.MSG</strong> (CFBF OLE2)</p>
+          <div class="dropzone-actions">
+            <button class="btn btn-primary" onclick="event.stopPropagation(); document.getElementById('file-input').click();">
+              📂 Seleccionar Archivo Local (.eml / .msg)
+            </button>
+          </div>
+        </section>
+
+        <!-- RAW TEXT INPUT PANEL -->
+        <section class="raw-text-panel" id="raw-text-panel">
+          <h3 style="font-size: 1.1rem; margin-bottom: 0.35rem; color: #fff;">📝 Pegar Contenido o Cabeceras de Correo</h3>
+          <p style="font-size: 0.84rem; color: var(--text-secondary); margin-bottom: 1rem;">
+            Compatible con texto directo copiado de <strong>Gmail ("Mostrar original" o vista web)</strong>, Outlook y cabeceras RFC 5322 estándar.
+          </p>
+          <textarea id="raw-email-input" class="raw-text-textarea" placeholder="Pegue aquí el texto plano del correo o las cabeceras...
+Ejemplo (Gmail Mostrar original, Outlook o estándar):
+Delivered-To: usuario@destino.com
+Received: from mail.google.com ([209.85.220.41]) by mx.google.com with ESMTPS;
+Authentication-Results: mx.google.com; spf=pass; dkim=pass; dmarc=pass
+From: &quot;Seguridad&quot; &lt;seguridad@empresa.com&gt;
+To: usuario@destino.com
+Subject: Notificación Forense
+Date: Fri, 16 Oct 2026 08:30:00 +0200
+Content-Type: text/plain; charset=utf-8
+
+Cuerpo del mensaje..."></textarea>
+          <div class="raw-text-actions">
+            <div style="display: flex; gap: 0.75rem;">
+              <button class="btn btn-secondary btn-sm" onclick="App.pasteFromClipboard()">
+                📋 Pegar Portapapeles
+              </button>
+              <button class="btn btn-secondary btn-sm" onclick="App.clearRawText()">
+                🧹 Limpiar
+              </button>
+            </div>
+            <button class="btn btn-primary" onclick="App.analyzeRawText()">
+              🚀 Analizar Texto Forense
+            </button>
+          </div>
+        </section>
+
+        <!-- SAMPLES BAR (OUTSIDE DROPZONE) -->
+        <div style="margin-top: -1rem; margin-bottom: 2rem; display: flex; align-items: center; justify-content: center; gap: 0.75rem; flex-wrap: wrap;" id="samples-container">
+          <span style="font-size: 0.82rem; color: var(--text-muted);">Cargar muestra rápida de prueba:</span>
+          <button class="sample-chip" onclick="App.loadSample('legitimate_email.eml')">
+            🟢 Muestra Legítima (SPF/DKIM/DMARC Pass)
+          </button>
+          <button class="sample-chip" onclick="App.loadSample('phishing_spoof.eml')">
+            🔴 Muestra Phishing Spoofed + Malware .exe
+          </button>
+          <button class="sample-chip" onclick="App.loadSample('invoice_sample.msg')">
+            📦 Muestra Outlook Factura .MSG
+          </button>
+        </div>
+
+        <!-- ANALYSIS RESULTS SECTION -->
+        <section id="analysis-results" style="display: none;">
+
+          <!-- VERDICT HERO CARD -->
+          <div class="verdict-hero">
+            <div class="verdict-gauge">
+              <div class="score-circle" id="hero-score-circle">
+                <span class="score-number" id="hero-score-val">0</span>
+                <span class="score-label">Riesgo / 100</span>
+              </div>
+              <div id="hero-risk-badge">
+                <span class="verdict-badge badge-success">Bajo Riesgo</span>
+              </div>
+            </div>
+
+            <div class="verdict-info">
+              <div style="font-size: 0.78rem; color: var(--accent-cyan); font-family: var(--font-mono); margin-bottom: 0.25rem;" id="hero-filename">
+                archivo.eml
+              </div>
+              <h2 id="hero-subject">(Sin Asunto)</h2>
+              
+              <div class="verdict-meta-grid">
+                <div class="meta-item">
+                  <span class="meta-label">Remitente (From)</span>
+                  <span class="meta-val" id="hero-from">-</span>
+                </div>
+                <div class="meta-item">
+                  <span class="meta-label">Destinatario (To)</span>
+                  <span class="meta-val" id="hero-to">-</span>
+                </div>
+                <div class="meta-item">
+                  <span class="meta-label">Fecha del Mensaje</span>
+                  <span class="meta-val" id="hero-date">-</span>
+                </div>
+                <div class="meta-item">
+                  <span class="meta-label">IP de Origen Detectada</span>
+                  <div class="meta-val" id="hero-origin-ip-wrap">
+                    <span id="hero-origin-ip" style="color: var(--accent-cyan); font-family: var(--font-mono); font-weight: 700;">-</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="verdict-sidebar">
+              <div class="protocol-mini-pill" id="pill-spf">
+                <span>SPF</span> <span class="card-badge badge-info">...</span>
+              </div>
+              <div class="protocol-mini-pill" id="pill-dkim">
+                <span>DKIM</span> <span class="card-badge badge-info">...</span>
+              </div>
+              <div class="protocol-mini-pill" id="pill-dmarc">
+                <span>DMARC</span> <span class="card-badge badge-info">...</span>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="App.exportAnalysisHtml()" style="width: 100%; justify-content: center; margin-top: 0.5rem;">
+                📄 Exportar Informe HTML
+              </button>
+              <button class="btn btn-secondary btn-sm" onclick="App.exportAnalysisJson()" style="width: 100%; justify-content: center; margin-top: 0.35rem;">
+                💾 Exportar Informe JSON
+              </button>
+            </div>
+          </div>
+
+          <!-- TABS NAVIGATION -->
+          <nav class="tabs-nav">
+            <button class="tab-btn active" data-tab="tab-overview">
+              🛡️ Protocolos de Seguridad
+            </button>
+            <button class="tab-btn" data-tab="tab-hops">
+              🌐 Trazabilidad de Red (SMTP Hops)
+            </button>
+            <button class="tab-btn" data-tab="tab-findings">
+              ⚠️ Vectores de Amenaza
+            </button>
+            <button class="tab-btn" data-tab="tab-content">
+              ✉️ Cuerpo y Adjuntos <span id="att-tab-count" style="color: var(--accent-cyan);"></span>
+            </button>
+            <button class="tab-btn" data-tab="tab-headers">
+              🔍 Cabeceras Raw (RFC 5322)
+            </button>
+            <button class="tab-btn" data-tab="tab-history">
+              🕒 Historial SQLite
+            </button>
+          </nav>
+
+          <!-- TAB 1: OVERVIEW & SECURITY PROTOCOLS -->
+          <div class="tab-pane active" id="tab-overview">
+            <div class="cards-grid-3">
+              
+              <!-- SPF CARD -->
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title">
+                    <span>🔐</span> Sender Policy Framework (SPF)
+                  </div>
+                </div>
+                <div id="card-spf-content">
+                  <!-- Injected via App.renderProtocolCards -->
+                </div>
+              </div>
+
+              <!-- DKIM CARD -->
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title">
+                    <span>✍️</span> DomainKeys Identified Mail (DKIM)
+                  </div>
+                </div>
+                <div id="card-dkim-content">
+                  <!-- Injected via App.renderProtocolCards -->
+                </div>
+              </div>
+
+              <!-- DMARC CARD -->
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title">
+                    <span>🏛️</span> DMARC & Alineación
+                  </div>
+                </div>
+                <div id="card-dmarc-content">
+                  <!-- Injected via App.renderProtocolCards -->
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- TAB 2: NETWORK HOPS -->
+          <div class="tab-pane" id="tab-hops">
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">
+                  <span>🌐</span> Rastro de Servidores Intermedios (SMTP Relays), Latencias y Localización
+                </div>
+              </div>
+              <div id="hops-container">
+                <!-- Injected via Components.renderHopTimeline -->
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 3: RISK FINDINGS -->
+          <div class="tab-pane" id="tab-findings">
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">
+                  <span>⚠️</span> Desglose de Indicadores de Riesgo y Recomendaciones Forenses
+                </div>
+              </div>
+              <div id="findings-container">
+                <!-- Injected via Components.renderFindings -->
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 4: EMAIL CONTENT & ATTACHMENTS -->
+          <div class="tab-pane" id="tab-content">
+            <div style="display: flex; gap: 1.5rem; flex-direction: column;">
+              
+              <!-- ATTACHMENTS SECTION -->
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title">
+                    <span>📎</span> Archivos Adjuntos Extraídos
+                  </div>
+                </div>
+                <div id="attachments-container">
+                  <!-- Injected via Components.renderAttachments -->
+                </div>
+              </div>
+
+              <!-- BODY PREVIEW SECTION -->
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title">
+                    <span>👁️</span> Vista Previa Segura del Mensaje (Sandboxed / Sin Scripts)
+                  </div>
+                </div>
+                
+                <div style="margin-bottom: 1rem; display: flex; gap: 0.75rem;">
+                  <button class="btn btn-secondary btn-sm" onclick="document.getElementById('email-html-frame').style.display='block'; document.getElementById('email-text-box').style.display='none';">
+                    Renderizado HTML Seguro
+                  </button>
+                  <button class="btn btn-secondary btn-sm" onclick="document.getElementById('email-html-frame').style.display='none'; document.getElementById('email-text-box').style.display='block';">
+                    Texto Plano
+                  </button>
+                </div>
+
+                <div class="email-preview-container">
+                  <iframe id="email-html-frame" class="email-preview-frame" sandbox="allow-same-origin"></iframe>
+                  <div id="email-text-box" class="text-preview-box" style="display: none;"></div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- TAB 5: RAW HEADERS -->
+          <div class="tab-pane" id="tab-headers">
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">
+                  <span>📜</span> Cabeceras Originales Completas
+                </div>
+                <div style="display: flex; gap: 0.75rem; align-items: center;">
+                  <input type="text" id="header-search" placeholder="Filtrar cabecera (ej: dkim, spf, received)..." style="background: var(--bg-input); border: 1px solid var(--border-color); color: #fff; padding: 0.35rem 0.75rem; border-radius: 6px; font-size: 0.8rem; width: 250px;">
+                  <button class="btn btn-secondary btn-sm" onclick="App.copyHeaders()">
+                    📋 Copiar
+                  </button>
+                </div>
+              </div>
+              <pre id="raw-headers-box" class="headers-code-box">Cargando cabeceras...</pre>
+            </div>
+          </div>
+
+          <!-- TAB 6: HISTORY -->
+          <div class="tab-pane" id="tab-history">
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">
+                  <span>🕒</span> Historial de Análisis Forenses en SQLite Local
+                </div>
+                <div style="display: flex; gap: 0.75rem; align-items: center;">
+                  <input type="text" id="history-search" placeholder="Buscar por asunto, remitente, IP..." style="background: var(--bg-input); border: 1px solid var(--border-color); color: #fff; padding: 0.35rem 0.75rem; border-radius: 6px; font-size: 0.8rem; width: 280px;">
+                  <button class="btn btn-secondary btn-sm" onclick="App.loadHistory()">
+                    🔄 Actualizar
+                  </button>
+                </div>
+              </div>
+              
+              <div class="table-container">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Fecha de Análisis</th>
+                      <th>Asunto</th>
+                      <th>Remitente</th>
+                      <th>IP Origen</th>
+                      <th>Riesgo</th>
+                      <th>Tipo</th>
+                      <th>Acción</th>
+                    </tr>
+                  </thead>
+                  <tbody id="history-tbody">
+                    <!-- Injected via Components.renderHistoryTable -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+      </div> <!-- END MAIN WORKSPACE CONTENT -->
+
+    </div> <!-- END APP LAYOUT -->
+  </main>
+
+  <!-- IP GEOLOCATION MODAL -->
+  <div id="geo-modal" class="geo-modal-backdrop" style="display: none;" onclick="if(event.target===this) App.closeGeoModal()">
+    <div class="geo-modal-card">
+      <div class="geo-modal-header">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <span style="font-size: 1.5rem;">🌐</span>
+          <div>
+            <h3 style="font-size: 1.15rem; color: #fff; margin: 0;">Auditoría Forense y Geolocalización de IP</h3>
+            <span style="font-size: 0.78rem; color: var(--accent-cyan); font-family: var(--font-mono);" id="modal-ip-title">IP: -</span>
+          </div>
+        </div>
+        <button class="geo-modal-close" onclick="App.closeGeoModal()">&times;</button>
+      </div>
+
+      <div class="geo-modal-body" id="modal-geo-body">
+        <!-- Rendered by Components.renderGeoModalContent -->
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast">Notificación</div>
+
+  <!-- SCRIPTS -->
+  <script src="js/components.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

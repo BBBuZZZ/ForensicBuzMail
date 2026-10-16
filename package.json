@@ -1,0 +1,24 @@
+{
+  "name": "forensic-buz-mail",
+  "version": "1.1.0",
+  "description": "ForensicBuzMail - Herramienta local de análisis forense y protocolos de seguridad en correos electrónicos (.eml, .msg y texto plano)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node tests/test_suite.js"
+  },
+  "keywords": [
+    "forensic-buz-mail",
+    "email-forensics",
+    "spf",
+    "dkim",
+    "dmarc",
+    "eml-parser",
+    "msg-parser",
+    "cybersecurity",
+    "smtp-hops",
+    "html-report"
+  ],
+  "author": "ForensicBuzMail Team",
+  "license": "MIT"
+}

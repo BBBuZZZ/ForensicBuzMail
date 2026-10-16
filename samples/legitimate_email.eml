@@ -1,0 +1,69 @@
+Delivered-To: recipient@mycompany.org
+Received: by 2002:a05:6808:1484:0:0:0:0 with SMTP id e4csp1287930oiw;
+        Wed, 14 Oct 2026 08:30:15 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF3c3/pA4KjXp1
+X-Received: by 2002:a17:902:d009:b0:1fe:72ba:3f7b with SMTP id f9-20020a170902d00900b001fe72ba3f7bmr18281031plt.29.1728919814512;
+        Wed, 14 Oct 2026 08:30:14 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1728919814; cv=none;
+        d=google.com; s=arc-20240605;
+        b=b7V8zF...
+Authentication-Results: mx.google.com;
+       dkim=pass header.i=@google.com header.s=20230601 header.b=K8yG3c;
+       spf=pass (google.com: domain of noreply-security@google.com designates 209.85.220.41 as permitted sender) smtp.mailfrom=noreply-security@google.com;
+       dmarc=pass (p=REJECT sp=REJECT dis=NONE) header.from=google.com
+Received-SPF: pass (google.com: domain of noreply-security@google.com designates 209.85.220.41 as permitted sender) client-ip=209.85.220.41;
+Received: from mail-sor-f41.google.com (mail-sor-f41.google.com. [209.85.220.41])
+        by mx.google.com with SMTPS id s17-20020a170902c59100b001f37e199d9bsor2789642plg.0.2026.10.14.08.30.13
+        for <recipient@mycompany.org>
+        (Google Transport Security);
+        Wed, 14 Oct 2026 08:30:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1728919813; x=1729524613;
+        h=to:from:subject:message-id:date:mime-version:content-type;
+        bh=yXm7vJ5D4uL2W8qZ1oP9rS0tV3wX6yB1cD4eF7gH0jI=;
+        b=K8yG3c89vNmQ1w2e3r4t5y6u7i8o9p0a1s2d3f4g5h6j7k8l9z0x1c2v3b4n5m6==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728919813; x=1729524613;
+        h=x-gm-message-state:to:from:subject:message-id:date:mime-version;
+        bh=yXm7vJ5D4uL2W8qZ1oP9rS0tV3wX6yB1cD4eF7gH0jI=;
+        b=P9o8i7u6y5t4r3e2w1q0z9x8c7v6b5n4m3l2k1j0h9g8f7d6s5a4P9o8i7u6y5==
+Return-Path: <noreply-security@google.com>
+From: "Google Security Alert" <noreply-security@google.com>
+To: recipient@mycompany.org
+Subject: Alerta de seguridad para tu cuenta de Google
+Date: Wed, 14 Oct 2026 15:30:12 +0000
+Message-ID: <CA+G6_x8Z-7y@mail.google.com>
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="000000000000a1b2c3d4e5f6"
+
+--000000000000a1b2c3d4e5f6
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+
+Hola:
+
+Se ha detectado un nuevo inicio de sesión en tu cuenta desde un dispositivo Windows autorizado.
+Si has sido tú, no necesitas realizar ninguna acción adicional.
+
+Equipo de Seguridad de Google.
+
+--000000000000a1b2c3d4e5f6
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE html>
+<html>
+<body style=3D"font-family: Arial, sans-serif; background-color: #f8fafc; =
+padding: 20px;">
+  <div style=3D"max-width: 600px; margin: 0 auto; background: #ffffff; pad=
+ding: 24px; border-radius: 8px;">
+    <h2 style=3D"color: #1e293b;">Alerta de seguridad de cuenta</h2>
+    <p>Se ha detectado un inicio de sesi=C3=B3n leg=C3=ADtimo en tu cuenta.=
+</p>
+    <p style=3D"color: #10b981; font-weight: bold;">Autenticaci=C3=B3n vali=
+dada por Google Security.</p>
+  </div>
+</body>
+</html>
+--000000000000a1b2c3d4e5f6--
+

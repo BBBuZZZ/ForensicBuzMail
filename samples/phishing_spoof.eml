@@ -1,0 +1,53 @@
+Received: from mx-backup.corp.net (mx-backup.corp.net [10.0.1.25])
+        by mailserver.internal.corp (Postfix) with ESMTPS id 4Zy7B10kLqz89
+        for <director@mycompany.org>; Thu, 15 Oct 2026 09:15:32 +0200
+Received: from relay01.darknet-bulletproof.ru (unknown [185.220.101.5])
+        by mx-backup.corp.net (Postfix) with ESMTP id 8K9L2M1N
+        for <director@mycompany.org>; Thu, 15 Oct 2026 09:14:48 +0200
+Received-SPF: fail (corp.net: domain of security-alert@paypal.com does not designate 185.220.101.5 as permitted sender) client-ip=185.220.101.5; envelope-from=bounce@darknet-bulletproof.ru;
+Authentication-Results: mx-backup.corp.net;
+        spf=fail (corp.net: 185.220.101.5 is not permitted) smtp.mailfrom=bounce@darknet-bulletproof.ru;
+        dkim=none (no signature found);
+        dmarc=fail (p=reject action=quarantine) header.from=paypal.com
+From: "PayPal Security Center" <security-alert@paypal.com>
+To: director@mycompany.org
+Reply-To: credential-collector@russian-stealer.xyz
+Return-Path: <bounce@darknet-bulletproof.ru>
+Subject: [URGENTE] Su cuenta de PayPal ha sido restringida por actividad inusual
+Date: Thu, 15 Oct 2026 09:14:20 +0200
+Message-ID: <20261015091420.F1234@attacker-host>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="BOUNDARY_MALICIOUS_PHISH"
+
+--BOUNDARY_MALICIOUS_PHISH
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE html>
+<html>
+<body style=3D"font-family: Arial, sans-serif; background-color: #f1f5f9; =
+padding: 20px;">
+  <div style=3D"max-width: 600px; margin: 0 auto; background: #ffffff; pad=
+ding: 24px; border: 2px solid #ef4444; border-radius: 8px;">
+    <h2 style=3D"color: #ef4444;">AVISO DE SEGURIDAD INMEDIATA</h2>
+    <p>Estimado cliente,</p>
+    <p>Hemos detectado intentos no autorizados de acceso a su cuenta desde =
+una ubicaci=C3=B3n desconocida.</p>
+    <p>Para desbloquear su cuenta, abra el informe de transacciones adjunto =
+y verifique su identidad en las pr=C3=B3ximas 24 horas.</p>
+    <p style=3D"color: #64748b; font-size: 12px;">Departamento de Seguridad=
+ de PayPal Inc.</p>
+  </div>
+</body>
+</html>
+
+--BOUNDARY_MALICIOUS_PHISH
+Content-Type: application/x-msdownload; name="Urgente_Detalle_Cuenta.pdf.exe"
+Content-Disposition: attachment; filename="Urgente_Detalle_Cuenta.pdf.exe"
+Content-Transfer-Encoding: base64
+
+TVqQAAMAAAAEAAAA//8AALgAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAyAAAAA4fug4AtAnNIbgBTM0hVGhpcyBwcm9ncmFtIGNhbm5vdCBiZSBydW4gaW4gRE9TIG1v
+ZGUuDQ0KJAAAAAAAAABQRQAATAEDAAAAAAAAAAAAAAAAAAAAAA==
+--BOUNDARY_MALICIOUS_PHISH--
+
